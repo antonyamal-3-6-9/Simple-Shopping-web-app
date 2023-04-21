@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+    <div class="parent clearfix">
+        <div class="bg-illustration">
+          <img src="https://i.ibb.co/Pcg0Pk1/logo.png" alt="logo">
+    
+          <div class="burger-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+    
+        </div>
+        {% for message in messages %}
+        <h2>{{message}}</h2>
+        {% endfor %}
+        <div class="login">
+          <div class="container">
+            <h1>Enter your Details</h1>
+        
+            <div class="login-form">
+              <form action="" method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">sign-Up</button>
+              </form>
+            </div>
+         
+          </div>
+      </div>
+{% endblock %}
+
+
+
+
+

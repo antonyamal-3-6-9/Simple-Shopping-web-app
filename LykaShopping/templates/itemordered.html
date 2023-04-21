@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+  <head>
+    <style>
+      /* Center the message vertically and horizontally */
+      body {
+        /* display: flex;
+        justify-content: center; */
+        align-items: center;
+        height: 700px;
+      }
+
+      /* Add animation to the message */
+      .message {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 3rem;
+        font-weight: bold;
+        animation: scale-in 0.5s ease-in-out;
+      }
+
+      /* Animation keyframes */
+      @keyframes scale-in {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      /* Optional: Add additional styles to customize the message */
+      .message p {
+        margin-bottom: 1rem;
+      }
+      .message a {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 1rem;
+        font-size: 1.5rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        animation: pulse 1s ease-in-out infinite;
+      }
+
+      /* Optional: Add an animation to the button */
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="message">
+        <p></p>
+      <p>Thank you for your order!</p>
+      <a href="{% url 'home' %}">Continue Shopping</a>
+    </div>
+  </body>
+
+{% endblock %}

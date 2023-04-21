@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div style="height: 700px;">
+<div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
+    <div class="list-group">
+    {% for order in orders %}
+      <a href="{% url 'orderdetails' order.orderid %}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+        <img src="/static/themes/images/shop.png" alt="twbs" width="32" height="32" class="rounded-circle flex-shrink-0">
+        <div class="d-flex gap-2 w-100 justify-content-between">
+          <div>
+            {% for item in items %}
+            {% if item.orderlist.orderid == order.orderid %}
+            <h5 class="mb-0">{{item.product.brand}} {{item.product.modelName}}</h5>
+            {% endif %}
+            {% endfor %}
+            <p class="mb-0 opacity-75">IOrderid: {{order.orderid}}</p>
+            <p class="mb-0 opacity-75">Expected Delivery: {{order.deliverydate}}</p>
+            <p class="mb-0 opacity-75">Placed on: {{order.placeddate}}</p>
+            <p class="mb-0 opacity-75">Order Status: {{order.status}}</p>
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}

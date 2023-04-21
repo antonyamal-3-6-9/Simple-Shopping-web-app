@@ -1,0 +1,52 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div id="mainBody">
+	<div class="container">
+	<div class="row">
+
+		<div class="container-fluid main-detail-container">
+			<div class="row">
+				<div class="col-lg-6 left-side">
+					<div class="product-images">
+						<div class="thumbnail-images">
+							<div class="thumbnail-image">
+							  <img src="{{device.show_image_1.image.url}}" alt="Product Image Thumbnail">
+							</div>
+						
+						  <div class="thumbnail-image">
+							<img src="{{device.show_image_2.image.url}}" alt="Product Image Thumbnail">
+						  </div>
+				
+						  <div class="thumbnail-image">
+							<img src="{{device.show_image_3.image.url}}" alt="Product Image Thumbnail">
+						  </div>
+					
+						  <div class="thumbnail-image">
+							<img src="{{device.show_image_4.image.url}}">
+						  </div>
+						
+						</div>
+						<div class="main-image">
+							<img src="{{device.show_image_1.image.url}}" alt="Product Image">
+						  </div>
+					  </div>
+				</div>
+				<div class="col-lg-6 right-side">
+					<h2>{{device.brand}}</h2>
+					<h3>{{device.modelName}}</h3>
+					<h5>{{device.availability}}</h5>
+					<h2>{{device.price}}</h2>
+					<p id="stock">{{device.stock}}</p>
+					<a href="{% url 'add' device.id %}" class="btn  btn-dark btn-large" id="cart-button">ADD TO CART</a>
+					<hr>
+					<p>{{device.desc}}</p>
+					<h3>Details</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+{% endblock %}

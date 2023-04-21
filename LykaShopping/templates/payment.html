@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<head>
+    <style>
+        .messages {
+    list-style: none;
+    padding: 1em;
+    margin: 1em 0;
+}
+
+.messages li {
+    padding: 0.5em;
+    margin: 0.5em 0;
+    border-radius: 5px;
+}
+
+.messages li.warning {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+        #main-container{
+            font-size: 1.2 rem;
+            font-weight: 600;
+        }
+        #savedcreditcards{
+            display: none;
+        }
+        #add-credit-card-details{
+            display: none;
+        }
+        #saveddebitcards{
+            display: none;
+        }
+        #add-debit-card-details{
+            display: none;
+        }
+        #saved-upi-ids{
+            display: none;
+        }
+        #add-new-upi-id-details{
+            display: none;
+        }
+        ul{
+            list-style: none;
+        }
+        .submit-button{
+            margin-left: 250px;
+            margin-top : 25px;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+
+<body>
+<h1>Make Payment</h1>
+<div class="container-fluid">
+<div id="main-container" class="card w-50" >
+<form action="{% url 'ordercompleted' orderId %}" method="POST">
+    {% csrf_token %}
+    <ul id="mainList" class="list-group">
+    <li class="list-group-item">
+        <h5 class="card-title card-header d-inline">Credit Card</h5>
+        <input class="form-check-input" type="radio" id="credit-card-radio" name="paymentMethod" value="credit-card">
+        <ul id="savedcreditcards" class="list-group-item card-body">
+          {% for i in creditcards %}
+          <div>
+            <li class="list-group-item">
+                <label>{{i.cardNumber}} <br> {{i.expiryDate}} <br> {{i.nameOnCard}}</label>
+                <input class="form-check-input" type="radio" name="creditcard" value="{{i.id}}">
+            </li>
+          </div>
+            {% endfor %}
+            <li class="list-group-item">
+                <label>Add new</label>
+                <input class="form-check-input" type="radio" id="add-new-credit-card" name="add-credit-card-radio" value="add-credit-card">
+            </li>
+            <ul id="add-credit-card-details" class="list-group-item">
+                <li class="list-group-item">
+                    <label>Card Number</label>
+                    <input class="form-control" type="number" name="credit-card-number">
+                </li>
+                <li class="list-group-item">
+                    <label>Name on Card</label>
+                    <input class="form-control" type="text" name="credit-card-name">
+                </li>
+                <li class="list-group-item">
+                    <label>Expiry Date</label>
+                    <input class="form-control" type="date" name="credit-card-expiry">
+                </li>
+                <li class="list-group-item">
+                    <label>CVV</label>
+                    <input class="form-control" type="number" name="credit-card-cvv">
+                </li>
+                <li>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="cc-owner" value="checked">
+                        <label>Save This Card</label>
+                    </div>
+                </li>
+            </ul>
+        </ul>
+    </li>
+    <li class="list-group-item">
+        <h5 class="card-title card-header d-inline">Debit Card</h5>
+        <input type="radio" id="debit-card-radio" name="paymentMethod" value="debit-card">
+        <ul id="saveddebitcards" class="list-group-item">
+            {% if debitcards %}
+            {% for i in debitcards %}
+            <div>
+              <li class="list-group-item">
+                  <label>{{i.cardNumber}} <br> {{i.expiryDate}} <br> {{i.nameOnCard}}</label>
+                  <input class="form-check-input" type="radio" name="debitcard" value="{{i.id}}">
+              </li>
+            </div>  
+              {% endfor %}
+              {% else %}
+              <li>
+                  <p>No Saved Cards</p>
+              </li>
+              {% endif %}
+            <li class="list-group-item">
+                <label>Add new Card</label>
+                <input type="radio" id="add-new-debit-card" name="add-debit-card-radio" value="add-debit-card">
+            </li>
+            <ul id="add-debit-card-details" class="list-group-item">
+                <li class="list-group-item">
+                    <label>Card Number</label>
+                    <input type="number"  name="debit-card-number" >
+                </li>
+                <li class="list-group-item">
+                    <label>Name on Card</label>
+                    <input type="text" name="debit-card-name">
+                </li>
+                <li class="list-group-item">
+                    <label>Expiry Date</label>
+                    <input type="date" name="debit-card-expiry">
+                </li>
+                <li class="list-group-item">
+                    <label>CVV</label>
+                    <input type="number" name="debit-card-cvv">
+                </li>
+                <li>
+                    <input type="checkbox" name="dc-owner" value="checked">
+                    <label>Save This Card</label>
+                </li>
+            </ul>
+        </ul>
+    </li>
+    <li class="list-group-item">
+        <h5 class="card-title card-header d-inline">UPI</h5>
+        <input type="radio" id="upi-radio" name="paymentMethod" value="upi-id-payment">
+        <ul id="saved-upi-ids" class="list-group-item">
+            {% if upis %}
+            {% for i in upis %}
+              <li class="list-group-item">
+                  <label>{{i.upiId}}</label>
+                  <input class="form-check-input" type="radio" name="upi-id" value="{{i.id}}">
+              </li>
+              {% endfor %}
+              {% else %}
+              <li>
+                  <p>No Saved UPIs</p>
+              </li>
+              {% endif %}
+            <li class="list-group-item">
+                <label>Add new UPI</label>
+                <input type="radio" id="add-new-upi-id" name="add-new-upi-id-radio" value="add-new-upi-id">
+            </li>
+            <ul id="add-new-upi-id-details" class="list-group-item">
+                <li class="list-group-item">
+                    <label>UPI ID</label>
+                    <input type="text" name="new-upi-id">
+                </li>
+                <li>
+                    <input type="checkbox" name="upi-owner" value="checked">
+                    <label>Save This Id</label>
+                </li>
+            </ul>
+        </ul>
+    </li>
+    <li class="list-group-item">
+        <h5 class="card-title card-header d-inline">Cash On Delivery</h5>
+        <input type="radio" id="cod-radio" name="paymentMethod" value="cod-payment">
+    </li>
+    </ul>
+    <button class="submit-button btn btn-primary" type="submit">Submit</button>
+</form>
+</div>
+</div>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+
+
+
+<script>
+
+const creditCardRadio = document.getElementById('credit-card-radio');
+const savedCreditCards = document.getElementById('savedcreditcards');
+const addNewCreditCardRadio = document.getElementById('add-new-credit-card');
+const creditcardRadios = document.getElementsByName('creditcard');
+const addCreditCardDetails = document.getElementById('add-credit-card-details');
+
+
+const debitCardRadio = document.getElementById('debit-card-radio');
+const savedDebitCards = document.getElementById('saveddebitcards');
+const addNewDebitCardRadio = document.getElementById('add-new-debit-card');
+const debitcardRadios = document.getElementsByName('debitcard');
+const addDebitCardDetails = document.getElementById('add-debit-card-details');
+
+const upiRadio = document.getElementById('upi-radio');
+const savedUpis = document.getElementById('saved-upi-ids')
+const addNewUpiRadio = document.getElementById('add-new-upi-id')
+const upiRadios = document.getElementsByName('upi-id')
+const addUpiDetails = document.getElementById('add-new-upi-id-details')
+
+const codRadio = document.getElementById('cod-radio')
+
+
+
+// Create a new input element
+const inputcredit = document.createElement('input');
+const inputContainercredit = document.createElement('div');
+
+// Set the element's attributes
+inputcredit.setAttribute('type', 'number');
+inputcredit.setAttribute('name', 'cvvsavedcredit');
+inputcredit.setAttribute('id', 'cvvsavedcredit');
+inputcredit.setAttribute('placeholder', 'Enter CVV');
+inputcredit.classList.add('form-control')
+
+inputContainercredit.classList.add('list-group-item')
+
+
+// Create a new label element
+const labelcredit = document.createElement('label');
+
+// Set the label's attributes
+labelcredit.setAttribute('for', 'cvvsavedcredit');
+labelcredit.textContent = 'CVV: ';
+
+
+inputContainercredit.appendChild(labelcredit);
+inputContainercredit.appendChild(inputcredit);
+
+const inputdebit = document.createElement('input');
+const inputContainerdebit = document.createElement('div');
+
+inputdebit.setAttribute('type', 'number');
+inputdebit.setAttribute('name', 'cvvsaveddebit');
+inputdebit.setAttribute('id', 'cvvsaveddebit');
+inputdebit.setAttribute('placeholder', 'Enter CVV');
+inputdebit.classList.add('form-control')
+
+inputContainerdebit.classList.add('list-group-item')
+
+
+// Create a new label element
+const labeldebit = document.createElement('label');
+
+// Set the label's attributes
+labeldebit.setAttribute('for', 'cvvsavedcredit');
+labeldebit.textContent = 'CVV: ';
+
+
+inputContainerdebit.appendChild(labeldebit);
+inputContainerdebit.appendChild(inputdebit);
+
+
+creditCardRadio.addEventListener('click', () => {
+    savedCreditCards.style.display = 'block';
+    savedDebitCards.style.display = "none";
+    savedUpis.style.display = "none";
+    addNewCreditCardRadio.addEventListener('click', () => {
+        addCreditCardDetails.style.display = 'block';
+        creditcardRadios.forEach(radio => {
+            radio.checked = false;
+        })
+    })
+    creditcardRadios.forEach(radio => {
+        radio.addEventListener('click', () => {
+            addCreditCardDetails.style.display = 'none'
+            addNewCreditCardRadio.checked = false;
+            const inputs = addCreditCardDetails.querySelectorAll("input");
+            inputs.forEach((input) => {
+            input.value = "";
+            });
+            const near = radio.closest('div')
+            near.appendChild(inputContainercredit)
+
+        })
+    })
+    debitCardRadio.checked = false;
+    upiRadio.checked = false;
+    codRadio.checked = false;
+    
+})
+
+
+debitCardRadio.addEventListener('click', () => {
+    savedDebitCards.style.display = "block";
+    savedCreditCards.style.display = "none";
+    savedUpis.style.display = "none";
+    addNewDebitCardRadio.addEventListener("click", () => {
+        addDebitCardDetails.style.display = 'block';
+        debitcardRadios.forEach(radio => {
+            radio.checked = false;
+        })
+    })
+    debitcardRadios.forEach(radio => {
+        radio.addEventListener("click", () => {
+            addDebitCardDetails.style.display = "none";
+            addNewDebitCardRadio.checked = false;
+            const inputs = addDebitCardDetails.querySelectorAll("input");
+            inputs.forEach((input) => {
+            input.value = "";
+            });
+            const near = radio.closest('div')
+            near.appendChild(inputContainerdebit)
+        })
+    })
+    creditCardRadio.checked = false;
+    upiRadio.checked = false;
+    codRadio.checked = false;
+})
+
+upiRadio.addEventListener("click", () => {
+    savedUpis.style.display = "block";
+    savedCreditCards.style.display = "none";
+    savedDebitCards.style.display = "none"
+    addNewUpiRadio.addEventListener("click", () => {
+        addUpiDetails.style.display = "block";
+        upiRadios.forEach(radio => {
+            radio.checked = false;
+        })
+    })
+    upiRadios.forEach(radio => {
+        radio.addEventListener("click",() => {
+            addUpiDetails.style.display = "none";
+            addNewUpiRadio.checked = false;
+            const inputs = addUpiDetails.querySelectorAll("input")
+            innputs.forEach(input => {
+                input.value = "";
+            })
+        })
+    })
+    creditCardRadio.checked = false;
+    debitCardRadio.checked = false;
+    codRadio.checked = false;
+})
+
+codRadio.addEventListener("click", () => {
+    savedCreditCards.style.display = "none";
+    savedDebitCards.style.display = "none";
+    savedUpis.style.display = "none";
+    creditCardRadio.checked = false;
+    debitCardRadio.checked = false;
+    upiRadio.checked = false;
+
+})
+
+</script>  
+</body>
+{% endblock %}

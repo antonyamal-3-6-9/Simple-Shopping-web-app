@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<div class="container">
+    <article class="card">
+        <div class="card-body">
+            <h6>Order-Id: {{orderlist.orderid}}</h6>
+            <article class="card">
+                <div class="card-body row">
+                {% if orderlist.status == "Cancelled" %}
+                    <div class="col"> <strong>Status: </strong> <br> <div style="color: rgb(44, 48, 112); font-weight: bolder;font-size: 2rem;">{{orderlist.status}}</div></div>
+                {% else %}
+                    <div class="col"> <strong>Estimated Delivery date: </strong> <br><div style="color: rgb(44, 48, 112); font-weight: bolder;font-size: 2rem;">{{orderlist.deliverydate}}</div></div>
+                    <div class="col"> <strong>Status: </strong> <br> <div style="color: rgb(44, 48, 112); font-weight: bolder;font-size: 2rem;">{{orderlist.status}}</div></div>
+                    <div class="col"> <strong>Total Price: </strong> <br> <div style="color: rgb(44, 48, 112); font-weight: bolder;font-size: 2rem;">{{orderlist.totalprice}}</div></div>
+                    <div class="col"> <strong>Contact No: </strong> <br> <div style="color: rgb(44, 48, 112); font-weight: bolder;font-size: 2rem;">{{orderlist.deliveryaddress.phone_number}}</div></div>
+                    <div class="col"> <strong>Tracking Id: </strong> <br> <div style="color: rgb(44, 48, 112); font-weight: bolder;font-size: 2rem;">{{orderlist.tracking_id}}</div></div>
+                    <div class="col"> <strong>Payment Status: </strong> <br> <div style="color: rgb(44, 48, 112); font-weight: bolder;font-size: 2rem;">{{orderlist.payment_status}}</div></div>
+                {% endif %}
+                    
+                </div>
+            </article>
+            <hr>
+            <ul class="row">
+                {% for i in details %}
+                <li class="col-md-4">
+                    <figure class="itemside mb-3">
+                        <div class="aside"><img style="width:200px;height:200px;" src="{{i.product.show_image_1.image.url}}" class="img-sm border"></div>
+                        <figcaption class="info align-self-center">
+                            <p class="title" style="color: rgb(44, 48, 112); font-weight: bolder">{{i.product.brand}} {{i.product.modelName}}</p><br><p style="color: rgb(44, 48, 112); font-weight: bolder;">{{i.totalItemPrice}}</p>
+                        </figcaption>
+                    </figure>
+                </li>
+                {% endfor %}
+            </ul>
+            <hr>
+            <a href="{% url 'myorder' %}" class="btn btn-warning" data-abc="true"> <i class="fa fa-chevron-left"></i> Back to orders</a>
+            {% if not orderlist.status == "Cancelled" %}
+            <div id="div1">
+                <button style="display: inline;margin-top: 20px;" id="cancel-button" class="btn btn-dark">Cancel Order</button>
+            </div>
+            {% endif %}
+            <script>
+                const button = document.getElementById("cancel-button")
+                let confirmationAdded = false;
+            
+                button.addEventListener('click', () => {
+                    if (!confirmationAdded) {
+                        const container = document.createElement('div');
+                        const prompt = document.createElement('h5');
+                        const yesLink = document.createElement('a');
+                        const noLink = document.createElement('a');
+            
+                        prompt.innerHTML = "Are you sure you want to cancel the current order?"
+                        yesLink.innerHTML = "Yes";
+                        noLink.innerHTML = "No";
+            
+                        yesLink.classList.add("btn", "btn-danger")
+                        noLink.classList.add("btn", "btn-warning")
+            
+                        yesLink.style.margin = "10px"
+                        noLink.style.margin = "10px"
+            
+                        container.appendChild(prompt);
+                        container.appendChild(yesLink);
+                        container.appendChild(noLink);
+                        yesLink.setAttribute("href", "{% url 'cancelorder' orderlist.orderid %}");
+            
+                        const parent = document.getElementById("div1")
+                        parent.appendChild(container);
+            
+                        noLink.addEventListener("click" , () => {
+                            container.remove()
+                            confirmationAdded = false;
+                        })
+            
+                        confirmationAdded = true;
+                    }
+                })
+            </script>
+            
+        </div>
+    </article>
+</div>
+<script src="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+
+
+{% endblock %}

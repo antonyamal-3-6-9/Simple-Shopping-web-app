@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6">
+            {% for ordereditem in ordereditems %}
+            <h5>{{ordereditem.product.brand}} {{ordereditem.product.modelName}}</h5>
+            <img style="width:300px;height:300px" src="{{ordereditem.product.show_image_1.image.url}}" alt="">
+            <h5>{{ordereditem.product.price}}</h5>
+            {% endfor %}
+            <h4>Total price: {{order.totalprice}}</h4>
+        </div>
+        <div class="col-lg-6">
+            <h5>{{address.billingName}}</h5>
+            <h5>{{address.phone_number}}</h5>
+            <h5>{{address.address_line_1}}</h5>
+            <h5>{{address.address_line_2}}</h5>
+        </div>
+    </div>
+     <a href="{% url 'denied' order.orderid %}" class="btn btn-warning">Cancel</a> <a href="{% url 'payment' order.orderid %}" class="btn btn-success">Proceed to Pay</a>
+</div>
+
+
+{% endblock %}
