@@ -10,7 +10,6 @@ from django.utils.timezone import now
 class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phno = models.IntegerField()
-    dob = models.DateField(max_length=50, default = now)
     uid = models.UUIDField(default = uuid.uuid4)
     
     def __str__(self):

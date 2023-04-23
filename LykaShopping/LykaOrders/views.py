@@ -23,7 +23,7 @@ def validate_name(name):
     else:
         return False
     
-import re
+
 
 def is_valid_mobile_number(number):
     pattern = r'^\+?[0-9]{10}$'
@@ -37,7 +37,7 @@ def checkout(request):
         return redirect("login")
     else:
         custom = Customer.objects.get(user=request.user)
-        cart = Cart.objects.get(cart_id=custom.uid)
+        cart = Cart.objects.get(cart_id=custom.uid, customer = custom)
         cartItems = CartItems.objects.filter(cartlist=cart)
         address = Address.objects.filter(owner_of_address=custom)
         for item in cartItems:
@@ -49,7 +49,7 @@ def checkout(request):
 def verify(request):
     orderid = None
     custom = Customer.objects.get(user=request.user)
-    cart = Cart.objects.get(cart_id=custom.uid)
+    cart = Cart.objects.get(cart_id=custom.uid, customer = custom)
     cartItems = CartItems.objects.filter(cartlist=cart)
 
 
@@ -68,16 +68,18 @@ def verify(request):
             country = request.POST.get('country')
             owner = request.POST.get('address-owner')
             print("new submit")
-            if not validate_name(billName) or not bool(billName):
-                messages.warning(request, "Invaid Name")
+
+            if not bool(city) or not bool(state) or not bool(country) or not bool(add1) or not bool(add2) or not bool(zipcode) or not bool(billName) or not bool(phno):
+                messages.warning(request, "Fields Must not be Empty")
                 return redirect('checkout')
-            if not is_valid_mobile_number(phno) or not bool(phno):
+
+            if not is_valid_mobile_number(phno):
                 messages.warning(request, "Invalid Phone Number")
                 return redirect("checkout")
-            if len(add1) < 10 or not bool(add1):
+            if len(add1) < 5:
                 messages.warning(request, "Invalid Address")
                 return redirect("checkout")
-            if len(add2) < 10 or not bool(add2):
+            if len(add2) < 5:
                 messages.warning(request, "Invalid Address")
                 return redirect("checkout")
             if not len(zipcode) == 6:
@@ -112,8 +114,6 @@ def verify(request):
                 orderlist=order, product=i.product, quantity=i.quantity)
             order.totalprice += orderedItems.product.price * orderedItems.quantity
             order.totalitems += orderedItems.quantity
-            orderedItems.product.stock -= orderedItems.quantity
-            orderedItems.product.save()
             order.save()
         ordereditems = OrderedItems.objects.filter(orderlist = order)
         return render(request, 'itemandaddress.html', {'order' : order, 'ordereditems' : ordereditems})
@@ -122,11 +122,12 @@ def verify(request):
 
 
 def myorder(request):
-    orderedItems = None
+    orderedItems = []
     custom = Customer.objects.get(user=request.user)
     order = Order.objects.filter(customer=custom)
     for i in order:
-        orderedItems = OrderedItems.objects.filter(orderlist = i)
+        items = OrderedItems.objects.filter(orderlist = i)
+        orderedItems.extend(items)
         if i.deliverydate < today or i.deliverydate == today:
             i.status = "Delivered"
             i.save()
@@ -167,7 +168,7 @@ def cardMasking(cardNumber):
 
 
 def is_valid_upi(upi_id):
-    pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    pattern = r'^[a-zA-Z0-9]+@[a-zA-Z0-9]+$'
     return bool(re.match(pattern, upi_id))
 
 
@@ -177,6 +178,15 @@ def payment(request, orderId):
     debitCardDetails = CardPaymentDetails.objects.filter(cardOwner=custom, cardType="Debit Card")
     upiDetails = UpiPaymentDetails.objects.filter(upiOwner=custom)
     return render(request, 'payment.html', {'creditcards' : creditCardDetails, 'debitcards' : debitCardDetails, 'upis' : upiDetails, 'orderId' : orderId} )
+
+
+
+def removeCart(custom):
+    cart = Cart.objects.get(cart_id = custom.uid, customer = custom)
+    cartItems = CartItems.objects.filter(cartlist = cart)
+    for i in cartItems:
+        i.delete()
+    
 
 
 
@@ -196,6 +206,7 @@ def ordercompleted(request, orderId):
                     order.payment_method = paymentMethod
                     order.payment_status = "Paid"
                     order.save()
+                    removeCart(custom)
                     return render(request, "itemordered.html")
                 else:
                     messages.warning(request, "Credit Card details not given")
@@ -214,7 +225,7 @@ def ordercompleted(request, orderId):
                     messages.warning(request, "Invalid Date")
                     return redirect(payment_url)
 
-                if not validate_name(name = name) or not bool(name):
+                if not validate_name(name = name):
                     messages.warning(request, "Invalid Name")
                     return redirect(payment_url)
                 if not len(number) >= 15 and not len(number) <= 19:
@@ -237,6 +248,7 @@ def ordercompleted(request, orderId):
                     order.payment_method = paymentMethod
                     order.payment_status = "Paid"
                     order.save()
+                    removeCart(custom)
                     if owner == "checked":
                         card.cardOwner = custom
                         card.save()
@@ -262,6 +274,7 @@ def ordercompleted(request, orderId):
                     order.payment_method = paymentMethod
                     order.payment_status = "Paid"
                     order.save()
+                    removeCart(custom)
                     return render(request, "itemordered.html")
                 else:
                     messages.warning(request, "Debit Card details not given")
@@ -280,7 +293,7 @@ def ordercompleted(request, orderId):
                     messages.warning(request, "Invalid Date")
                     return redirect(payment_url)
 
-                if not validate_name(name = name) or not bool(name):
+                if not validate_name(name = name):
                     messages.warning(request, "Invalid Name")
                     return redirect(payment_url)
                 if not len(number) >= 15 and len(number) <= 19:
@@ -307,6 +320,7 @@ def ordercompleted(request, orderId):
                     order.payment_method = paymentMethod
                     order.payment_status = "Paid"
                     order.save()
+                    removeCart(custom)
                     if owner == "checked":
                         card.cardOwner = custom
                         card.save()
@@ -331,6 +345,7 @@ def ordercompleted(request, orderId):
                     order.payment_method = paymentMethod
                     order.payment_status = "Paid"
                     order.save()
+                    removeCart(custom)
                     return render(request, "itemordered.html")
                 else:
                     return redirect(payment_url)
@@ -347,6 +362,7 @@ def ordercompleted(request, orderId):
                     order.payment_method = paymentMethod
                     order.payment_status = "Paid"
                     order.save()
+                    removeCart(custom)
                     if owner == "checked":
                         upi.upiOwner = custom
                         upi.save()
@@ -366,6 +382,7 @@ def ordercompleted(request, orderId):
             order.payment_method = "Cash On Delivery"
             order.payment_status = "Pending"
             order.save()
+            removeCart(custom)
             return render(request, "itemordered.html")
         else:
             messages.warning(request, "Try Again")
@@ -377,13 +394,6 @@ def ordercompleted(request, orderId):
 def orderdetails(request, orderId):
     order = Order.objects.get(orderid= orderId)
     details = OrderedItems.objects.filter(orderlist = order)
-
-    # if order.deliverydate < today or order.deliverydate == today:
-    #     order.status = "Delivered"
-    #     order.save()
-    # elif order.deliverydate < shippingDay or order.deliverydate == shippingDay:
-    #     order.status = "Shipped"
-    #     order.save()
     return render(request, 'orderdetails.html', {'details': details, 'orderlist' : order})
 
 
@@ -393,6 +403,7 @@ def cancelorder(request, orderId):
     for i in orderedItems:
         i.product.stock += i.quantity
         i.product.save()
+        i.save()
     order.status = "Cancelled"
     order.save()
     return redirect('myorder')
@@ -402,7 +413,6 @@ def denied(request, orderId):
     order = Order.objects.get(orderid = orderId)
     orderedItems = OrderedItems.objects.filter(orderlist= order)
     for i in orderedItems:
-        i.product.stock += i.quantity
-        i.product.save()
+        i.delete()
     order.delete()
     return redirect('home')

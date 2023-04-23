@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% if messages %}
+
+<head>
+    <style>
+                .messages {
+    list-style: none;
+    padding: 1em;
+    margin: 1em 0;
+}
+
+.messages li {
+    padding: 0.5em;
+    margin: 0.5em 0;
+    border-radius: 5px;
+}
+
+.messages li.success {
+    background-color: lightpink;
+    color: darkred;
+    border-color: lightcoral;
+}
+    </style>
+</head>
+
+<ul class="messages" id="message">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+
+{% endif %}
+<div id="user-profile-list">
+    <div class="card text-center">
+        <div id="user-profile-change-list">
+        <form class="form-group" action="" method="POST">
+            {% csrf_token %}
+            <label for="first_name">First Name</label>
+            <input class="form-control w-25 d-inline" type="text" id="first-name" name="first-name" value="{{customer.user.first_name}}">
+            <br>
+            <br>
+            <label for="last_name">Last Name</label>
+            <input class="form-control w-25 d-inline"  type="text" id="last-name" name="last-name" value="{{customer.user.last_name}}">
+            <br>
+            <br>
+            <label for="phone-number">Phone:</label>
+            <input class="form-control w-25 d-inline"  type="tel" id="phone-number" name="phone-number" value="{{customer.phno}}">
+            <br>
+            <br>
+            <label for="username">Username</label>
+            <input class="form-control w-25 d-inline"  type="text" id="username" name="username" value="{{customer.user.username}}">
+            <br>
+            <br>
+            <label for="email">Email</label>
+            <input class="form-control w-25 d-inline"  type="email" id="email-id" name="email-id" value="{{customer.user.email}}">
+            <br>
+            <br>
+        <button class="btn btn-warning" type="submit" id="submit-user-profile" name="user-submit-button" style="display:none;">Save Changes</button>
+        <a href="{% url 'profile' %}" class="btn btn-danger" id="cancel-user-submit">Cancel</a>
+        </form>
+    </div>
+    </div>
+</div>
+    <br><br>
+    <input  class="form-check d-inline" type="radio" id="change-password-radio" name="change-password-radio">
+    <label>Change Password</label>
+    <br>
+    <br>
+<div id="change-password-div" style="display: none;">
+<form action="" method="POST">
+    {% csrf_token %}
+    <label for="id_old_password">Current Password:</label>
+    <input class="form-control w-25 d-inline"  type="password" name="old_password" id="id_old_password">
+    <br>
+    <br>
+    <label for="id_new_password1">New Password:</label>
+    <input class="form-control w-25 d-inline"  type="password" name="new_password1" id="id_new_password1">
+    <br>
+    <br>
+    <label for="id_new_password2">Confirm New Password:</label>
+    <input class="form-control w-25 d-inline"  type="password" name="new_password2" id="id_new_password2">
+    <br>
+    <br>            
+    <button type="submit" name="password-submit-button">Change Password</button>
+    <a href="{% url 'profile' %}">Cancel</a>
+  </form>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script>
+
+    
+const changePasswordRadio = $("#change-password-radio");
+        const changePasswordDiv = $("#change-password-div");
+
+        const userProfileChangeList = $("#user-profile-change-list");
+        const userProfileChangeButton = $("#submit-user-profile")
+        const userCancelButton = $("#cancel-user-submit");
+        const inputs = userProfileChangeList.find("input");
+
+        const passwordInputs = changePasswordDiv.find("input");
+
+        const firstName = $("#first-name").val()
+        const lastName = $("#last-name").val()
+        const phNo = $("#phone-number").val()
+        const emailId = $("#email-id").val()
+        const userName = $("#username").val()
+
+        let passwordFlag = true;
+
+        changePasswordRadio.click(() => {
+            if(passwordFlag) {
+                changePasswordDiv.css("display", "block");
+                userProfileChangeList.css("display", "none");
+            } else {
+                changePasswordRadio.prop("checked", false);
+                changePasswordDiv.css("display", "none");
+                userProfileChangeList.css("display", "block");
+                userProfileChangeButton.css("display", "none");
+                userCancelButton.css("display", "inline");
+                passwordInputs.each(function(){
+                    $(this).val("");
+                })
+            }
+            passwordFlag = !passwordFlag;
+        })
+
+        inputs.each(() => {
+            $(this).on("input", () => {
+                userProfileChangeButton.css("display", "inline")
+            })
+        })
+        userCancelButton.click(() => {
+            userProfileChangeButton.css("display", "none");
+            userCancelButton.css("display", "none");
+            $("#first-name").prop("value", firstName);
+            $("#last-name").prop("value", lastName);
+            $("#phone-number").prop("value", phNo);
+            $("#email-id").prop("value", emailId);
+            $("#username").prop("value", userName);
+        })
+
+
+
+    
+</script>
+
+
+{% endblock %}

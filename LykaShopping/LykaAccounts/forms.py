@@ -12,11 +12,11 @@ class CustomerForm(forms.ModelForm):
     password1 = forms.CharField(widget=forms.PasswordInput, required=True)
     password2 = forms.CharField(widget=forms.PasswordInput, required=True)
     phno = forms.CharField(max_length=20, required=True)
-    dob = forms.DateField(required=True, widget=forms.DateInput(attrs={'type': 'date'}))
+
 
     class Meta:
         model = Customer
-        fields = ['phno', 'dob']
+        fields = ['phno']
 
     def save(self, commit=True):
         user = User.objects.create_user(

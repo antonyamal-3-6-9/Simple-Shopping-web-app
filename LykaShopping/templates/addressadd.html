@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<head>
+    <style>
+        .messages {
+      list-style: none;
+      padding: 1em;
+      margin: 1em 0;
+  }
+  
+  .messages li {
+      padding: 0.5em;
+      margin: 0.5em 0;
+      border-radius: 5px;
+  }
+  
+  .messages li.warning {
+      background-color: #f8d7da;
+      color: #721c24;
+      border-color: #f5c6cb;
+  }
+    </style>
+  </head>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+
+<div class="container-fluid">
+    <div id="new-address-form" class="row justify-content-center">
+      <div class="col-lg-8">
+        <form class="needs-validation" action="" method="POST" novalidate>
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <label for="firstName" class="form-label">Full Name</label>
+              <input type="text" class="form-control" name="billingName" required>
+              <div class="invalid-feedback">
+                Valid first name is required.
+              </div>
+            </div>
+    
+    
+            <div class="col-6">
+              <label for="phone" class="form-label">Phone Number<span class="text-body-secondary"></label>
+              <input type="number" class="form-control" name="phone" required>
+              <div class="invalid-feedback">
+                Please enter a valid email address for shipping updates.
+              </div>
+            </div>
+    
+            <div class="col-12">
+              <label for="address" class="form-label">Address Line 1</label>
+              <input type="text" class="form-control" name="address1" required>
+              <div class="invalid-feedback">
+                Please enter your shipping address.
+              </div>
+            </div>
+    
+            <div class="col-12">
+              <label for="address2" class="form-label">Address Line 2 <span class="text-body-secondary"></label>
+              <input type="text" class="form-control" name="address2" required>
+            </div>
+    
+            
+            <div class="col-md-4">
+              <label for="city" class="form-label">City</label>
+              <input class="form-control" name="city" required>
+              <div class="invalid-feedback">
+                Please provide a valid state.
+              </div>
+            </div>
+            
+    
+            <div class="col-md-4">
+              <label for="state" class="form-label">State</label>
+              <input class="form-control" name="state" required>
+              <div class="invalid-feedback">
+                Please provide a valid state.
+              </div>
+            </div>
+    
+            <div class="col-md-3">
+              <label for="zip" class="form-label">Zip</label>
+              <input type="number" class="form-control" name="zip" required>
+              <div class="invalid-feedback">
+                Zip code required.
+              </div>
+            </div>
+          </div>
+    
+          <div class="col-md-5">
+            <label for="country" class="form-label">Country</label>
+            <input class="form-control" name="country" required>
+            <div class="invalid-feedback">
+            </div>
+          </div>
+          <hr class="my-4">
+    
+          <button class="btn btn-primary d-inline" name="newSubmit" type="submit">Save Address</button>
+          <a href="{% url 'profile' %}" class="btn btn-warning">Cancel</a>
+        </form>
+        
+    </div>
+    </div>
+    </div>
+
+
+{% endblock %}

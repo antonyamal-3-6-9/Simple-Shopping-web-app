@@ -18,7 +18,7 @@ def displayCart(request, totalPrice = 0, itemCount = 0, cartItems = None):
     else:
         custom = Customer.objects.get(user = request.user)
         try:
-            cart = Cart.objects.get(cart_id = custom.uid)
+            cart = Cart.objects.get(cart_id = custom.uid, customer = custom)
         except ObjectDoesNotExist:
             return render(request, 'cart.html')
     cartItems = CartItems.objects.filter(cartlist = cart)
@@ -44,19 +44,23 @@ def addToCart(request, productId):
     else:
         custom = Customer.objects.get(user = request.user)
         try:
-            cart = Cart.objects.get(cart_id = custom.uid)
+            cart = Cart.objects.get(cart_id = custom.uid, customer = custom)
         except ObjectDoesNotExist:
-            cart = Cart.objects.create(cart_id = custom.uid)
+            cart = Cart.objects.create(cart_id = custom.uid, customer = custom)
             cart.save()
     try:
         cartItems = CartItems.objects.get(cartlist = cart, product = product)
         if product.stock > 0:
             cartItems.quantity += 1
+            product.stock -= 1
+            product.save()
         cartItems.save()
     except ObjectDoesNotExist:
         cartItems = CartItems.objects.create(cartlist = cart, product = product, quantity = 0)
         if product.stock > 0:
             cartItems.quantity += 1
+            product.stock -= 1
+            product.save()
         cartItems.save()
     route = product.getUrlDev()
     print(route)
@@ -68,7 +72,7 @@ def incrementItem(request, product_id):
         cart = Cart.objects.get(cart_id = cartId(request))
     else:
         custom = Customer.objects.get(user = request.user)
-        cart = Cart.objects.get(cart_id = custom.uid)
+        cart = Cart.objects.get(cart_id = custom.uid, customer = custom)
     product = Device.objects.get(id=product_id)
     cartItem = CartItems.objects.get(product = product, cartlist = cart)
     if product.stock > 0:
@@ -84,7 +88,7 @@ def decrementItem(request, product_id):
         cart = Cart.objects.get(cart_id = cartId(request))
     else:
         custom = Customer.objects.get(user = request.user)
-        cart = Cart.objects.get(cart_id = custom.uid)
+        cart = Cart.objects.get(cart_id = custom.uid, customer = custom)
     product = Device.objects.get(id = product_id)
     cartItem = CartItems.objects.get(product = product, cartlist = cart)
     if cartItem.quantity > 1:
@@ -93,6 +97,8 @@ def decrementItem(request, product_id):
         cartItem.save()
         product.save()
     elif cartItem.quantity == 1:
+        product.stock += 1
+        product.save()
         cartItem.delete()
     return redirect ("displaycart")
 
@@ -102,8 +108,10 @@ def deleteItem(request, product_id):
         cart = Cart.objects.get(cart_id = cartId(request))
     else:
         custom = Customer.objects.get(user = request.user)
-        cart = Cart.objects.get(cart_id = custom.uid)
+        cart = Cart.objects.get(cart_id = custom.uid, customer = custom)
     product = Device.objects.get(id = product_id)
     cartItem = CartItems.objects.get(product = product, cartlist = cart)
+    product.stock += cartItem.quantity
+    product.save()
     cartItem.delete()
     return redirect ("displaycart")

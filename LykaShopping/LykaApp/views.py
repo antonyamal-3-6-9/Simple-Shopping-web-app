@@ -14,7 +14,7 @@ def home(request, cSlug = None):
     else:
         devs = Device.objects.all()
     cat = Cate.objects.all()
-    pg = Paginator(devs, 1)
+    pg = Paginator(devs, 4)
     try:
         pgNum = int(request.GET.get('page','1'))
     except PageNotAnInteger:
@@ -38,7 +38,7 @@ def search(request):
     if request.method == "GET":
         searchQuery = request.GET.get('query')
         prodc = Device.objects.all().filter(Q(brand__icontains=searchQuery)|Q(modelName__icontains=searchQuery))
-    pg = Paginator(prodc, 1)
+    pg = Paginator(prodc, 2)
     try:
         pgNum = int(request.GET.get('page','1'))
     except PageNotAnInteger:
